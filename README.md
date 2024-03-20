@@ -16,3 +16,7 @@ Simple React Snippets
 React Native Tools
 node-snippets
 ES7+ React/Redux/React-Native snippets
+
+Test Account:
+test@wisc.edu
+Tester12345
