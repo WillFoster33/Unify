@@ -14,35 +14,47 @@ export default function SignupPage({ navigation }) {
   // Function to handle signup
   const handleSignup = () => {
     // Email validation
+    // Check if the email ends with '@wisc.edu'
     if (!email.endsWith('@wisc.edu')) {
       Alert.alert('Error', 'Please use a valid @wisc.edu email address');
       return;
     }
 
-   // Password validation
-   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,}$/;
+    // Password validation
+    // Check if the password meets the required criteria
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,}$/;
     if (!passwordRegex.test(password)) {
-    Alert.alert('Invalid Password', 'Password must be at least 8 characters long, include a number, have at least one uppercase and one lowercase letter, and contain no spaces');
-    return;
-  }
+      Alert.alert('Invalid Password', 'Password must be at least 8 characters long, include a number, have at least one uppercase and one lowercase letter, and contain no spaces');
+      return;
+    }
+
+    // Create a new user with the provided email and password using Firebase authentication
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
         const user = userCredential.user;
         console.log('Registered with: ', user.email);
+        // Navigate to the Verification screen after successful signup
         navigation.navigate('Verification');
       })
-      .catch((error) => Alert.alert('Invalid Sign Up', 'User already exists. Please log in.'));
+      .catch((error) => {
+        // Display an error message if the email is already associated with an account
+        Alert.alert('Invalid Sign Up', 'The email address you entered is already associated with an account. Please use a different email address or log in to your existing account.');
+      });
   };
 
   return (
+    // Use a linear gradient background for the signup screen
     <LinearGradient
       colors={['#4c669f', '#3b5998', '#192f6a']}
       style={styles.background}
     >
+      {/* Container for the signup form */}
       <View style={styles.container}>
+        {/* Title text */}
         <Text style={styles.title}>Sign Up</Text>
+
         {/* Email input field */}
         <TextInput
           style={styles.input}
@@ -53,6 +65,7 @@ export default function SignupPage({ navigation }) {
           value={email}
           onChangeText={setEmail}
         />
+
         {/* Password input field */}
         <TextInput
           style={styles.input}
@@ -62,14 +75,17 @@ export default function SignupPage({ navigation }) {
           value={password}
           onChangeText={setPassword}
         />
+
         {/* Signup button */}
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
+
         {/* Login link */}
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.linkText}>Already have an account? Log In</Text>
         </TouchableOpacity>
+
         {/* Back to Home link */}
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Text style={styles.linkText}>Back to Home</Text>
@@ -79,7 +95,7 @@ export default function SignupPage({ navigation }) {
   );
 }
 
-
+// Styles for the SignupPage component
 const styles = StyleSheet.create({
   background: {
     flex: 1,

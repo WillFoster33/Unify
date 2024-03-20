@@ -15,8 +15,11 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+// Check if Firebase has already been initialized
 if (!firebase.apps.length) {
+  // If Firebase is not initialized, initialize it with the provided configuration
   firebase.initializeApp(firebaseConfig);
 }
 
+// Export the initialized Firebase instance as the default export
 export default firebase;
