@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import firebase from '../../backend/firebase';
+import firebase from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 
 // Define the LoginPage component
@@ -19,6 +19,7 @@ export default function LoginPage({ navigation }) {
     })
     return unsubscribe;
   }, []);
+
   const handleLogin = () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password.');
@@ -34,19 +35,21 @@ export default function LoginPage({ navigation }) {
           console.log('Logged in with:', user.email);
           // Navigate to the user home page or desired screen
           navigation.navigate('UserHome');
-        } 
+        } else {
+          Alert.alert('Error', 'Please verify your email before logging in.');
+        }
       })
       .catch((error) => {
         if (error.code === 'auth/invalid-email' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
           Alert.alert('Error', 'Incorrect email or password.');
         } else if (error.code === 'auth/too-many-requests') {
           Alert.alert('Error', 'Too many failed log in attempts. Please reset your password or try again later.');
-        }
-        else {
+        } else {
           Alert.alert('Error', error.message);
         }
       });
   };
+
   return (
     <LinearGradient
       colors={['#4c669f', '#3b5998', '#192f6a']}
@@ -83,7 +86,7 @@ export default function LoginPage({ navigation }) {
         </TouchableOpacity>
         {/* Back to Home link */}
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-            <Text style={styles.linkText}>Back to Home</Text>
+          <Text style={styles.linkText}>Back to Home</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>
