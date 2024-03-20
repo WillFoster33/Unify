@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import firebase from '../../backend/firebase';
+import firebase from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 
 // Define the LoginPage component
@@ -23,7 +23,10 @@ export default function LoginPage({ navigation }) {
     return unsubscribe;
   }, []);
 
+<<<<<<< HEAD
   // Function to handle the login process
+=======
+>>>>>>> 184c9dbe0c9cdc746391ee51a6b09914a1dfd2ee
   const handleLogin = () => {
     // Check if both email and password fields are filled
     if (!email || !password) {
@@ -42,6 +45,11 @@ export default function LoginPage({ navigation }) {
           console.log('Logged in with:', user.email);
           // Navigate to the UserHome screen
           navigation.navigate('UserHome');
+<<<<<<< HEAD
+=======
+        } else {
+          Alert.alert('Error', 'Please verify your email before logging in.');
+>>>>>>> 184c9dbe0c9cdc746391ee51a6b09914a1dfd2ee
         }
       })
       .catch((error) => {
