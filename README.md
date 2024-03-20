@@ -10,5 +10,9 @@ npx expo install react-native-screens react-native-safe-area-context
 Run expo:
 npx expo start
 
+Extensions in VScode:
 
-
+Simple React Snippets
+React Native Tools
+node-snippets
+ES7+ React/Redux/React-Native snippets
