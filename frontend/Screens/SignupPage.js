@@ -35,9 +35,15 @@ export default function SignupPage({ navigation }) {
       .then((userCredential) => {
         const user = userCredential.user;
         console.log('Registered with: ', user.email);
-        // Navigate to the Verification screen after successful signup
-        navigation.navigate('Verification');
+        //Send verification email
+        user.sendEmailVerification()
+        .then(() => {
+          navigation.navigate('Verification');
+          // Navigate to the Verification screen after successful signup
       })
+      .catch((error) => {
+        Alert.alert('Error', 'Failed to send verification email, please try again.');
+      });})
       .catch((error) => {
         // Display an error message if the email is already associated with an account
         Alert.alert('Invalid Sign Up', 'The email address you entered is already associated with an account. Please use a different email address or log in to your existing account.');
