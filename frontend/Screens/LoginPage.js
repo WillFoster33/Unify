@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import firebase from '../firebase';
+import firebase from '../../backend/firebase';
 import { useNavigation } from '@react-navigation/native';
 
 // Define the LoginPage component
