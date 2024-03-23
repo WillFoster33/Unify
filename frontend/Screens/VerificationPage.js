@@ -1,9 +1,28 @@
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import firebase from '../../backend/firebase';
 
 export default function VerificationPage({ navigation }) {
+  const [canResend, setCanResend] = useState(false);
+  const [countdown, setCountdown] = useState(20);
+
+  useEffect(() => {
+    let timer;
+    if (!canResend) {
+      timer = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown === 1) {
+            setCanResend(true);
+            clearInterval(timer);
+          }
+          return prevCountdown - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [canResend]);
+
   const handleVerificationCheck = () => {
     const user = firebase.auth().currentUser;
     if (user) {
@@ -27,12 +46,25 @@ export default function VerificationPage({ navigation }) {
     }
   };
 
+  const handleResendEmail = () => {
+    const user = firebase.auth().currentUser;
+    if (user) {
+      user.sendEmailVerification()
+        .then(() => {
+          Alert.alert('Email Sent', 'Verification email has been sent to your email address.');
+          setCanResend(false);
+          setCountdown(20);
+        })
+        .catch((error) => {
+          console.log('Error sending verification email:', error);
+          Alert.alert('Error', 'Failed to send verification email, please try again.');
+        });
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#4c669f', '#3b5998', '#192f6a']}
-        style={styles.background}
-      >
+      <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.background}>
         <Text style={styles.title}>Email Verification</Text>
         <Text style={styles.description}>
           Please check your email and click the verification link to verify your email address.
@@ -40,6 +72,15 @@ export default function VerificationPage({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={handleVerificationCheck}>
           <Text style={styles.buttonText}>Now Verified</Text>
         </TouchableOpacity>
+        <View style={styles.resendButtonContainer}>
+          <TouchableOpacity
+            style={[styles.resendButton, canResend ? styles.resendButtonEnabled : styles.resendButtonDisabled]}
+            onPress={handleResendEmail}
+            disabled={!canResend}
+          >
+            <Text style={styles.resendButtonText}>{canResend ? 'Resend Email' : `Resend in ${countdown}s`}</Text>
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
     </View>
   );
@@ -78,6 +119,26 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  resendButtonContainer: {
+    marginTop: 30,
+  },
+  resendButton: {
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  resendButtonEnabled: {
+    backgroundColor: '#2196F3',
+  },
+  resendButtonDisabled: {
+    backgroundColor: 'rgba(33, 150, 243, 0.5)',
+  },
+  resendButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
   },
