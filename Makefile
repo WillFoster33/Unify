@@ -1,3 +1,4 @@
+# Installs all necessary dependencies and runs app
 .PHONY: all install run clean
 
 all: install run

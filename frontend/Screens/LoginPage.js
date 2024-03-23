@@ -12,16 +12,22 @@ export default function LoginPage({ navigation }) {
   const [password, setPassword] = useState('');
 
   // useEffect hook to check if the user is already logged in
-  useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        // If the user is already logged in, navigate to the UserHome screen
+useEffect(() => {
+  const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      // Check if the user's email is verified
+      if (user.emailVerified) {
+        // If the user is already logged in and their email is verified, navigate to the UserHome screen
         navigation.navigate('UserHome');
+      } else {
+        // If the user is logged in but their email is not verified, navigate to the Verification screen
+        navigation.navigate('Verification');
       }
-    });
-    // Clean up the subscription when the component unmounts
-    return unsubscribe;
-  }, []);
+    }
+  });
+  // Clean up the subscription when the component unmounts
+  return unsubscribe;
+}, []);
 
   // Function to handle the login process
   const handleLogin = () => {
