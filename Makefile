@@ -9,6 +9,7 @@ install:
 	npm install @react-navigation/stack
 	npm install react-navigation
 	npm install @react-navigation/native @react-navigation/native-stack
+	npm install react-native-elements
 	npx expo install firebase
 	npx expo install react-native-screens react-native-safe-area-context
 

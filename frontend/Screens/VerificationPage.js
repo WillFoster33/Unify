@@ -1,11 +1,21 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Icon } from 'react-native-elements';
 import firebase from '../../backend/firebase';
 
 export default function VerificationPage({ navigation }) {
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(20);
+  const [scaleAnimation] = useState(new Animated.Value(0));
+
+  useEffect(() => {
+    Animated.timing(scaleAnimation, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   useEffect(() => {
     let timer;
@@ -29,10 +39,8 @@ export default function VerificationPage({ navigation }) {
       user.reload()
         .then(() => {
           if (user.emailVerified) {
-            // Navigate to the UserHomePage if the user's email is verified
             navigation.navigate('UserHome');
           } else {
-            // Display an error message if the email is not verified
             Alert.alert('Error', 'Please verify your email before proceeding.');
           }
         })
@@ -41,7 +49,6 @@ export default function VerificationPage({ navigation }) {
           Alert.alert('Error', 'Failed to check email verification status, please try again.');
         });
     } else {
-      // Display an error message if the user is not signed in
       Alert.alert('Error', 'You need to be signed in to check your email verification status.');
     }
   };
@@ -65,22 +72,26 @@ export default function VerificationPage({ navigation }) {
   return (
     <View style={styles.container}>
       <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.background}>
-        <Text style={styles.title}>Email Verification</Text>
-        <Text style={styles.description}>
-          Please check your email and click the verification link to verify your email address.
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={handleVerificationCheck}>
-          <Text style={styles.buttonText}>Now Verified</Text>
-        </TouchableOpacity>
-        <View style={styles.resendButtonContainer}>
-          <TouchableOpacity
-            style={[styles.resendButton, canResend ? styles.resendButtonEnabled : styles.resendButtonDisabled]}
-            onPress={handleResendEmail}
-            disabled={!canResend}
-          >
-            <Text style={styles.resendButtonText}>{canResend ? 'Resend Email' : `Resend in ${countdown}s`}</Text>
+        <Animated.View style={[styles.contentContainer, { transform: [{ scale: scaleAnimation }] }]}>
+          <Icon name="email" type="material-community" size={80} color="white" />
+          <Text style={styles.title}>Email Verification</Text>
+          <Text style={styles.description}>
+            Please check your email and click the verification link to verify your email address.
+          </Text>
+          <TouchableOpacity style={styles.button} onPress={handleVerificationCheck}>
+            <Text style={styles.buttonText}>Verify Now</Text>
           </TouchableOpacity>
-        </View>
+          <View style={styles.resendButtonContainer}>
+            <TouchableOpacity
+              style={[styles.resendButton, canResend ? styles.resendButtonEnabled : styles.resendButtonDisabled]}
+              onPress={handleResendEmail}
+              disabled={!canResend}
+            >
+              <Text style={styles.resendButtonText}>{canResend ? 'Resend Email' : `Resend in ${countdown}s`}</Text>
+            </TouchableOpacity>
+            <Text style={styles.footnote}>Didn't get an email? Check your spam folder or try resending.</Text>
+          </View>
+        </Animated.View>
       </LinearGradient>
     </View>
   );
@@ -96,11 +107,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
+  contentContainer: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    padding: 30,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 20,
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: 'center',
   },
   description: {
     fontSize: 18,
@@ -115,15 +134,16 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginTop: 20,
     width: '100%',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
   resendButtonContainer: {
     marginTop: 30,
+    alignItems: 'center',
   },
   resendButton: {
     borderRadius: 20,
@@ -131,15 +151,21 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   resendButtonEnabled: {
-    backgroundColor: '#2196F3',
+    backgroundColor: 'white',
   },
   resendButtonDisabled: {
-    backgroundColor: 'rgba(33, 150, 243, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
   resendButtonText: {
-    color: 'white',
+    color: '#2196F3',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  footnote: {
+    marginTop: 10,
+    fontSize: 14,
+    color: 'white',
     textAlign: 'center',
   },
 });
