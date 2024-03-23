@@ -30,24 +30,29 @@ export default function SignupPage({ navigation }) {
 
     // Create a new user with the provided email and password using Firebase authentication
     firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log('Registered with: ', user.email);
-        //Send verification email
-        user.sendEmailVerification()
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log('Registered with: ', user.email);
+
+      user.sendEmailVerification()
         .then(() => {
-          navigation.navigate('Verification');
-          // Navigate to the Verification screen after successful signup
-      })
-      .catch((error) => {
-        Alert.alert('Error', 'Failed to send verification email, please try again.');
-      });})
-      .catch((error) => {
-        // Display an error message if the email is already associated with an account
-        Alert.alert('Invalid Sign Up', 'The email address you entered is already associated with an account. Please use a different email address or log in to your existing account.');
-      });
+          // Check if the user is signed in before navigating to the VerificationPage
+          if (firebase.auth().currentUser) {
+            navigation.navigate('Verification');
+          } else {
+            Alert.alert('Error', 'Failed to sign in after sending verification email, please try again.');
+          }
+        })
+        .catch((error) => {
+          Alert.alert('Error', 'Failed to send verification email, please try again.');
+        });
+    })
+    .catch((error) => {
+      // Display an error message if the email is already associated with an account
+      Alert.alert('Invalid Sign Up', 'The email address you entered is already associated with an account. Please use a different email address or log in to your existing account.');
+    });
   };
 
   return (
