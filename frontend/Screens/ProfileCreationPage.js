@@ -40,21 +40,33 @@ export default function ProfileCreationPage({ navigation }) {
         });
 
         if (!result.cancelled) {
-            setProfilePicture(result.uri);
+            setProfilePicture(result.assets[0].uri); // Use result.assets[0].uri instead of result.uri
         }
     };
 
     const uploadProfilePicture = async (userId) => {
         if (profilePicture) {
-            const response = await fetch(profilePicture);
-            const blob = await response.blob();
+            try {
+                const response = await fetch(profilePicture);
+                const blob = await response.blob();
 
-            const ref = firebase.storage().ref().child(`profile_pictures/${userId}.jpg`);
-            await ref.put(blob);
+                const ref = firebase.storage().ref().child(`profile_pictures/${userId}/profile.jpg`);
+                const snapshot = await ref.put(blob);
 
-            const downloadURL = await ref.getDownloadURL();
-            return downloadURL;
+                if (snapshot.state === 'success') {
+                    const downloadURL = await ref.getDownloadURL();
+                    console.log('Profile picture uploaded successfully. Download URL:', downloadURL);
+                    return downloadURL;
+                } else {
+                    console.error('Error uploading profile picture. Snapshot state:', snapshot.state);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error uploading profile picture:', error);
+                return null;
+            }
         }
+        console.log('No profile picture selected');
         return null;
     };
 
