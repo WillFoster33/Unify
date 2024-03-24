@@ -12,6 +12,7 @@ install:
 	npm install react-native-elements
 	npx expo install firebase
 	npx expo install react-native-screens react-native-safe-area-context
+	npm expo install expo-image-picker  
 
 run:
 	npx expo start
