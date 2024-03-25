@@ -1,72 +1,72 @@
-// Import necessary dependencies
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { auth } from '../../backend/firebase';
 import firebase from '../../backend/firebase';
 
-// Define the SignupPage component
 export default function SignupPage({ navigation }) {
-  // State variables for email and password
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fadeAnimation] = useState(new Animated.Value(0));
+  const [scaleAnimation] = useState(new Animated.Value(0));
 
-  // Function to handle signup
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnimation, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnimation, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   const handleSignup = () => {
-    // Email validation
-    // Check if the email ends with '@wisc.edu'
     if (!email.endsWith('@wisc.edu')) {
       Alert.alert('Error', 'Please use a valid @wisc.edu email address');
       return;
     }
 
-    // Password validation
-    // Check if the password meets the required criteria
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,}$/;
     if (!passwordRegex.test(password)) {
       Alert.alert('Invalid Password', 'Password must be at least 8 characters long, include a number, have at least one uppercase and one lowercase letter, and contain no spaces');
       return;
     }
 
-    // Create a new user with the provided email and password using Firebase authentication
     firebase
-    .auth()
-    .createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      console.log('Registered with: ', user.email);
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log('Registered with: ', user.email);
 
-      user.sendEmailVerification()
-        .then(() => {
-          // Check if the user is signed in before navigating to the VerificationPage
-          if (firebase.auth().currentUser) {
-            navigation.navigate('Verification');
-          } else {
-            Alert.alert('Error', 'Failed to sign in after sending verification email, please try again.');
-          }
-        })
-        .catch((error) => {
-          Alert.alert('Error', 'Failed to send verification email, please try again.');
-        });
-    })
-    .catch((error) => {
-      // Display an error message if the email is already associated with an account
-      Alert.alert('Invalid Sign Up', 'The email address you entered is already associated with an account. Please use a different email address or log in to your existing account.');
-    });
+        user.sendEmailVerification()
+          .then(() => {
+            if (firebase.auth().currentUser) {
+              navigation.navigate('Verification');
+            } else {
+              Alert.alert('Error', 'Failed to sign in after sending verification email, please try again.');
+            }
+          })
+          .catch((error) => {
+            Alert.alert('Error', 'Failed to send verification email, please try again.');
+          });
+      })
+      .catch((error) => {
+        Alert.alert('Invalid Sign Up', 'The email address you entered is already associated with an account. Please use a different email address or log in to your existing account.');
+      });
   };
 
   return (
-    // Use a linear gradient background for the signup screen
-    <LinearGradient
-      colors={['#4c669f', '#3b5998', '#192f6a']}
-      style={styles.background}
-    >
-      {/* Container for the signup form */}
-      <View style={styles.container}>
-        {/* Title text */}
-        <Text style={styles.title}>Sign Up</Text>
-
-        {/* Email input field */}
+    <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.background}>
+      <Animated.View style={[styles.container, { opacity: fadeAnimation, transform: [{ scale: scaleAnimation }] }]}>
+        <Animated.View style={{ transform: [{ scale: scaleAnimation }] }}>
+          <Text style={styles.title}>Sign Up</Text>
+        </Animated.View>
         <TextInput
           style={styles.input}
           placeholder="Email (@wisc.edu)"
@@ -76,8 +76,6 @@ export default function SignupPage({ navigation }) {
           value={email}
           onChangeText={setEmail}
         />
-
-        {/* Password input field */}
         <TextInput
           style={styles.input}
           placeholder="Password"
@@ -86,36 +84,35 @@ export default function SignupPage({ navigation }) {
           value={password}
           onChangeText={setPassword}
         />
-
-        {/* Signup button */}
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-
-        {/* Login link */}
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.linkText}>Already have an account? Log In</Text>
-        </TouchableOpacity>
-
-        {/* Back to Home link */}
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Text style={styles.linkText}>Back to Home</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.linkContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.linkText}>Already have an account? Log In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.linkText}>Back to Home</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
     </LinearGradient>
   );
 }
 
-// Styles for the SignupPage component
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   container: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    padding: 30,
+    width: '100%',
   },
   title: {
     fontSize: 32,
@@ -137,21 +134,24 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#2196F3',
     borderRadius: 30,
-    paddingHorizontal: 25,
-    paddingVertical: 15,
-    marginTop: 20,
+    paddingHorizontal: 30,
+    paddingVertical: 18,
+    marginTop: 30,
     width: '100%',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
+  },
+  linkContainer: {
+    marginTop: 20,
   },
   linkText: {
     color: 'white',
     fontSize: 16,
-    marginTop: 20,
+    marginTop: 10,
     textAlign: 'center',
   },
 });

@@ -40,7 +40,7 @@ export default function ProfileCreationPage({ navigation }) {
         });
 
         if (!result.cancelled) {
-            setProfilePicture(result.assets[0].uri); // Use result.assets[0].uri instead of result.uri
+            setProfilePicture(result.assets[0].uri);
         }
     };
 
@@ -71,6 +71,11 @@ export default function ProfileCreationPage({ navigation }) {
     };
 
     const handleCreateProfile = async () => {
+        if (!displayName) {
+            Alert.alert('Display Name Required', 'Please enter a display name to create your profile.');
+            return;
+        }
+
         try {
             const user = firebase.auth().currentUser;
             if (user) {

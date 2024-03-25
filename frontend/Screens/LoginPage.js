@@ -1,59 +1,63 @@
-// Import necessary dependencies
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import firebase from '../../backend/firebase';
 import { useNavigation } from '@react-navigation/native';
 
-// Define the LoginPage component
-export default function LoginPage({ navigation }) {
-  // State variables to store email and password input values
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fadeAnimation] = useState(new Animated.Value(0));
+  const [scaleAnimation] = useState(new Animated.Value(0));
+  const navigation = useNavigation();
 
-  // useEffect hook to check if the user is already logged in
-useEffect(() => {
-  const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // Check if the user's email is verified
-      if (user.emailVerified) {
-        // If the user is already logged in and their email is verified, navigate to the UserHome screen
-        navigation.navigate('UserHome');
-      } else {
-        // If the user is logged in but their email is not verified, navigate to the Verification screen
-        navigation.navigate('Verification');
+  useEffect(() => {
+    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        if (user.emailVerified) {
+          navigation.navigate('UserHome');
+        } else {
+          navigation.navigate('Verification');
+        }
       }
-    }
-  });
-  // Clean up the subscription when the component unmounts
-  return unsubscribe;
-}, []);
+    });
+    return unsubscribe;
+  }, []);
 
-  // Function to handle the login process
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnimation, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnimation, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   const handleLogin = () => {
-    // Check if both email and password fields are filled
     if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
     }
 
-    // Sign in the user with email and password using Firebase authentication
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        // Check if the user's email is verified
         if (user.emailVerified) {
           console.log('Logged in with:', user.email);
-          // Navigate to the UserHome screen
           navigation.navigate('UserHome');
         } else {
           Alert.alert('Error', 'Please verify your email before logging in.');
         }
       })
       .catch((error) => {
-        // Handle different error cases
         if (error.code === 'auth/invalid-email' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
           Alert.alert('Error', 'Incorrect email or password.');
         } else if (error.code === 'auth/too-many-requests') {
@@ -65,17 +69,11 @@ useEffect(() => {
   };
 
   return (
-    // Use a linear gradient background for the login screen
-    <LinearGradient
-      colors={['#4c669f', '#3b5998', '#192f6a']}
-      style={styles.background}
-    >
-      {/* Container for the login form */}
-      <View style={styles.container}>
-        {/* Title text */}
-        <Text style={styles.title}>Log In</Text>
-        
-        {/* Email input field */}
+    <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.background}>
+      <Animated.View style={[styles.container, { opacity: fadeAnimation, transform: [{ scale: scaleAnimation }] }]}>
+        <Animated.View style={{ transform: [{ scale: scaleAnimation }] }}>
+          <Text style={styles.title}>Log In</Text>
+        </Animated.View>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -85,8 +83,6 @@ useEffect(() => {
           value={email}
           onChangeText={setEmail}
         />
-        
-        {/* Password input field */}
         <TextInput
           style={styles.input}
           placeholder="Password"
@@ -95,41 +91,38 @@ useEffect(() => {
           value={password}
           onChangeText={setPassword}
         />
-        
-        {/* Login button */}
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
-        
-        {/* Signup link */}
-        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-          <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
-        </TouchableOpacity>
-        
-        {/* Forgot password link */}
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.linkText}>Forgot Password?</Text>
-        </TouchableOpacity>
-        
-        {/* Back to Home link */}
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Text style={styles.linkText}>Back to Home</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.linkContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <Text style={styles.linkText}>Forgot Password?</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.linkText}>Back to Home</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
     </LinearGradient>
   );
 }
 
-// Styles for the LoginPage component
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   container: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    padding: 30,
+    width: '100%',
   },
   title: {
     fontSize: 32,
@@ -151,21 +144,24 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#2196F3',
     borderRadius: 30,
-    paddingHorizontal: 25,
-    paddingVertical: 15,
-    marginTop: 20,
+    paddingHorizontal: 30,
+    paddingVertical: 18,
+    marginTop: 30,
     width: '100%',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
+  },
+  linkContainer: {
+    marginTop: 20,
   },
   linkText: {
     color: 'white',
     fontSize: 16,
-    marginTop: 20,
+    marginTop: 10,
     textAlign: 'center',
   },
 });

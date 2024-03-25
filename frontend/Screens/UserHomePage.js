@@ -28,8 +28,8 @@ export default function UserHomePage({ navigation }) {
     <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.background}>
       {/* Container for the user home page content */}
       <View style={styles.container}>
-        {/* Display the welcome message with the user's email */}
-        <Text style={styles.title}>Welcome, {user?.email}!</Text>
+        {/* Display the welcome message with the user's display name */}
+        <Text style={styles.title}>Welcome, {user?.displayName}!</Text>
         {/* Display a message indicating the user is logged in */}
         <Text style={styles.text}>You are now logged in.</Text>
 
