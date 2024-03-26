@@ -12,6 +12,11 @@ import ForgotPasswordPage from './frontend/Screens/ForgotPasswordPage';
 import FirstLastNamePage from './frontend/ProfileCreation/FirstLastNamePage';
 import InterestsPage from './frontend/ProfileCreation/InterestsPage';
 import ProfilePicturePage from './frontend/ProfileCreation/ProfilePicturePage';
+import SellProductPage from './frontend/SellingProduct/SellProductPage';
+import AboutPage from './frontend/Screens/AboutPage';
+import HelpPage from './frontend/Screens/HelpPage';
+import UserAccountPage from './frontend/UserActivity/UserAccountPage';
+import ProductDescription from './frontend/SellingProduct/ProductDescription';
 
 // Create a stack navigator
 const Stack = createStackNavigator();
@@ -31,6 +36,11 @@ export default function App() {
         <Stack.Screen name = "FirstLastName" component = {FirstLastNamePage} options = {{ headerShown: false }} />
         <Stack.Screen name = "Interests" component = {InterestsPage} options = {{ headerShown: false }} />
         <Stack.Screen name = "ProfilePicture" component = {ProfilePicturePage} options = {{ headerShown: false }} />
+        <Stack.Screen name = "SellProduct" component = {SellProductPage} options = {{ headerShown: false }} />
+        <Stack.Screen name = "About" component = {AboutPage} options = {{ headerShown: false }} />
+        <Stack.Screen name = "Help" component = {HelpPage} options = {{ headerShown: false }} />
+        <Stack.Screen name = "UserAccount" component = {UserAccountPage} options = {{ headerShown: false }} />
+        <Stack.Screen name = "ProductDescription" component = {ProductDescription} options = {{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

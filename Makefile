@@ -13,7 +13,8 @@ install:
 	npx expo install firebase
 	npx expo install react-native-screens react-native-safe-area-context
 	npm expo install expo-image-picker  
-
+	npm install react-native-popup-menu
+	
 run:
 	npx expo start
 
