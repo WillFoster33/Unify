@@ -9,7 +9,9 @@ import LoginPage from './frontend/Screens/LoginPage';
 import VerificationPage from './frontend/Screens/VerificationPage';
 import UserHomePage from './frontend/Screens/UserHomePage';
 import ForgotPasswordPage from './frontend/Screens/ForgotPasswordPage';
-import ProfileCreationPage from './frontend/Screens/ProfileCreationPage';
+import FirstLastNamePage from './frontend/ProfileCreation/FirstLastNamePage';
+import InterestsPage from './frontend/ProfileCreation/InterestsPage';
+import ProfilePicturePage from './frontend/ProfileCreation/ProfilePicturePage';
 
 // Create a stack navigator
 const Stack = createStackNavigator();
@@ -26,7 +28,9 @@ export default function App() {
         <Stack.Screen name="Verification" component={VerificationPage} options={{ headerShown: false }} />
         <Stack.Screen name="UserHome" component={UserHomePage} options={{ headerShown: false }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordPage} options={{ headerShown: false }} />
-        <Stack.Screen name = "ProfileCreation" component = {ProfileCreationPage} options = {{ headerShown: false }} />
+        <Stack.Screen name = "FirstLastName" component = {FirstLastNamePage} options = {{ headerShown: false }} />
+        <Stack.Screen name = "Interests" component = {InterestsPage} options = {{ headerShown: false }} />
+        <Stack.Screen name = "ProfilePicture" component = {ProfilePicturePage} options = {{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

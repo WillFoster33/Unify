@@ -39,7 +39,7 @@ export default function VerificationPage({ navigation }) {
       user.reload()
         .then(() => {
           if (user.emailVerified) {
-            navigation.navigate('ProfileCreation');
+            navigation.navigate('FirstLastName');
           } else {
             Alert.alert('Error', 'Please verify your email before proceeding.');
           }

@@ -1,13 +1,32 @@
 // Import necessary dependencies
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import firebase from '../../backend/firebase';
 
 // Define the UserHomePage component
 export default function UserHomePage({ navigation }) {
+  const [displayName, setDisplayName] = useState('');
+    const user = firebase.auth().currentUser;
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    setDisplayName(userData.displayName);
+                } else {
+                    console.log('User document does not exist');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
   // Get the currently logged-in user
-  const user = firebase.auth().currentUser;
 
   // Function to handle user sign out
   const handleSignOut = () => {
@@ -29,7 +48,7 @@ export default function UserHomePage({ navigation }) {
       {/* Container for the user home page content */}
       <View style={styles.container}>
         {/* Display the welcome message with the user's display name */}
-        <Text style={styles.title}>Welcome, {user?.displayName}!</Text>
+        <Text style={styles.title}>Welcome, {displayName}!</Text>
         {/* Display a message indicating the user is logged in */}
         <Text style={styles.text}>You are now logged in.</Text>
 
